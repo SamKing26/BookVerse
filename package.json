@@ -1,0 +1,25 @@
+{
+  "name": "bookverse-reader",
+  "version": "1.0.0",
+  "description": "Immersive eBook reader with realistic book feel",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server . -p 8080 -c-1",
+    "dev": "http-server . -p 8080 -c-1 -o",
+    "serve": "npx http-server . -p 8080 -c-1"
+  },
+  "keywords": [
+    "ebook",
+    "reader",
+    "book",
+    "pdf"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "pdfkit": "^0.18.0"
+  }
+}

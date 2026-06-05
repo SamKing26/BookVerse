@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookVerse — Immersive Reading Experience</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+
+    <!-- CSS Modules -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/preloader.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/book.css">
+    <link rel="stylesheet" href="css/settings.css">
+    <link rel="stylesheet" href="css/features.css">
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-book">
+            <div class="preloader-pages"></div>
+            <div class="cover">
+                <div class="cover-title">BookVerse</div>
+                <div class="cover-line"></div>
+                <div class="cover-subtitle">Loading...</div>
+            </div>
+        </div>
+        <p class="preloader-text">Opening your book</p>
+    </div>
+
+    <!-- Ambient Overlay -->
+    <div class="ambient-overlay" id="ambientOverlay"></div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Main App -->
+    <div id="app">
+        <!-- Dictionary Popup -->
+        <div class="dict-popup" id="dictPopup">
+            <div class="dict-header">
+                <span class="dict-word" id="dictWord"></span>
+                <button class="dict-close" id="dictClose">✕</button>
+            </div>
+            <div class="dict-body" id="dictBody"></div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar" id="searchBar">
+            <input type="text" placeholder="Search in book..." id="bookSearchInput">
+            <button class="search-bar-btn" id="searchNextBtn">Next</button>
+            <div class="search-results-info" id="searchResultsInfo"></div>
+        </div>
+
+        <!-- TTS Control Bar -->
+        <div class="tts-bar" id="ttsBar">
+            <button class="tts-btn" id="ttsRewind" title="Rewind">⏪</button>
+            <button class="tts-btn" id="ttsPlayPause" title="Play/Pause">▶</button>
+            <button class="tts-btn" id="ttsForward" title="Forward">⏩</button>
+            <div class="tts-separator"></div>
+            <div class="tts-voice-wrapper">
+                <button class="tts-voice-btn" id="ttsVoiceBtn" title="Change voice">🧑 Voice</button>
+                <div class="voice-picker" id="voicePicker">
+                    <div class="voice-picker-header">Choose Voice</div>
+                    <div class="voice-picker-list" id="voicePickerList"></div>
+                </div>
+            </div>
+            <div class="tts-slider-group">
+                <span class="tts-slider-icon">⚡</span>
+                <input type="range" id="ttsSpeedSlider" min="50" max="200" value="100" class="tts-volume-slider">
+                <span class="tts-slider-value" id="ttsSpeedValue">1.0x</span>
+            </div>
+            <div class="tts-slider-group">
+                <span class="tts-slider-icon" id="ttsVolIcon">🔊</span>
+                <input type="range" id="ttsVolume" min="0" max="100" value="100" class="tts-volume-slider">
+            </div>
+            <button class="tts-close" id="ttsClose">✕</button>
+        </div>
+
+        <!-- Go To Page Modal -->
+        <div class="goto-modal" id="gotoModal">
+            <div class="goto-box">
+                <h3>Go to Page</h3>
+                <input type="number" class="goto-input" id="gotoInput" min="1" placeholder="Page number">
+                <div class="goto-range" id="gotoRange">1 — 100</div>
+                <div class="goto-actions">
+                    <button class="goto-go" id="gotoGo">Go</button>
+                    <button class="goto-cancel" id="gotoCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading Timer Badge -->
+        <div class="timer-badge" id="timerBadge">00:00</div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">BOOK<span>VERSE</span></div>
+                <div class="sidebar-subtitle">Your Library</div>
+            </div>
+
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="Search books..." id="searchInput">
+            </div>
+
+            <div class="book-list" id="bookList">
+                <div style="margin-bottom: 16px;">
+                    <button class="btn-import-pdf" id="sidebarImportBtn" style="
+                        width: 100%;
+                        padding: 14px;
+                        background: rgba(212, 165, 116, 0.1);
+                        border: 1px dashed rgba(212, 165, 116, 0.3);
+                        border-radius: 10px;
+                        color: var(--accent-light);
+                        font-family: var(--font-ui);
+                        font-size: 13px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                    ">
+                        📥 Import PDF / eBook
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading Area -->
+        <div class="reading-area" id="readingArea">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="tool-btn" id="toggleSidebar" title="Library">📚</button>
+                    <button class="tool-btn" id="toggleToc" title="Table of Contents">📑</button>
+                    <span class="toolbar-title" id="toolbarTitle">The Great Gatsby</span>
+                </div>
+                <div class="toolbar-right">
+                    <div class="import-btn-wrapper">
+                        <button class="tool-btn" id="importPdfBtn" title="Import PDF">📥</button>
+                        <input type="file" accept=".pdf" class="import-input" id="importPdfInput">
+                    </div>
+                    <button class="tool-btn" id="searchBookBtn" title="Search in book">🔍</button>
+                    <button class="tool-btn" id="ttsBtn" title="Read aloud">🔊</button>
+                    <button class="tool-btn" id="focusModeBtn" title="Focus mode">🎯</button>
+                    <button class="tool-btn" id="addBookmark" title="Bookmark">🔖</button>
+                    <button class="tool-btn" id="toggleFullscreen" title="Fullscreen">⛶</button>
+                    <button class="tool-btn" id="toggleSettings" title="Settings">⚙</button>
+                </div>
+            </div>
+
+            <!-- Book -->
+            <div class="book-container" id="bookContainer">
+                <div class="book" id="book">
+                    <div class="page-edge page-edge-left"></div>
+                    <div class="page page-left" id="pageLeft">
+                        <div class="page-content">
+                            <div class="page-header">
+                                <span class="page-chapter" id="leftChapter">Chapter 1</span>
+                                <span class="page-number" id="leftPageNum">4</span>
+                            </div>
+                            <div class="page-text" id="leftContent"></div>
+                            <div class="page-footer">
+                                <div class="page-footer-line"></div>
+                                <span class="page-number" id="leftFooterNum">4</span>
+                                <div class="page-footer-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page page-right" id="pageRight">
+                        <div class="page-content">
+                            <div class="page-header">
+                                <span class="page-chapter" id="rightChapter">Chapter 1</span>
+                                <span class="page-number" id="rightPageNum">5</span>
+                            </div>
+                            <div class="page-text" id="rightContent"></div>
+                            <div class="page-footer">
+                                <div class="page-footer-line"></div>
+                                <span class="page-number" id="rightFooterNum">5</span>
+                                <div class="page-footer-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-edge page-edge-right"></div>
+                    <div class="bookmark-indicator" id="bookmarkIndicator">
+                        <div class="bookmark-flag"></div>
+                    </div>
+                </div>
+                <div class="book-shadow"></div>
+            </div>
+
+            <!-- Navigation -->
+            <button class="nav-arrow nav-prev" id="prevPage" title="Previous page">‹</button>
+            <button class="nav-arrow nav-next" id="nextPage" title="Next page">›</button>
+
+            <!-- Keyboard Hints -->
+            <div class="keyboard-hints">
+                <div class="key-hint"><span class="key">←</span> Previous</div>
+                <div class="key-hint"><span class="key">→</span> Next</div>
+                <div class="key-hint"><span class="key">F</span> Fullscreen</div>
+                <div class="key-hint"><span class="key">B</span> Bookmark</div>
+                <div class="key-hint"><span class="key">/</span> Search</div>
+                <div class="key-hint"><span class="key">G</span> Go to page</div>
+                <div class="key-hint"><span class="key">Esc</span> Focus mode</div>
+            </div>
+
+            <!-- Progress -->
+            <div class="reading-progress">
+                <div class="reading-progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Reading Stats -->
+            <div class="reading-stats">
+                <div class="stat-item">📖 <span class="stat-value" id="statPage">1</span> / <span id="statTotal">100</span></div>
+                <div class="stat-item">⏱ <span class="stat-value" id="statTime">0m</span></div>
+            </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel collapsed" id="settingsPanel">
+            <div class="settings-title">Reading Settings</div>
+
+            <div class="setting-group">
+                <div class="setting-label">Paper Theme</div>
+                <div class="theme-options">
+                    <button class="theme-btn day" data-theme="day" title="Day">☀️</button>
+                    <button class="theme-btn sepia active" data-theme="sepia" title="Sepia">📜</button>
+                    <button class="theme-btn night" data-theme="night" title="Night">🌙</button>
+                    <button class="theme-btn dark" data-theme="dark" title="Dark">⬛</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-label">Typeface</div>
+                <div class="font-options">
+                    <button class="font-btn active" data-font="'EB Garamond', serif">
+                        <span style="font-family: 'EB Garamond', serif; font-size: 16px;">Garamond</span>
+                        <span class="check">✓</span>
+                    </button>
+                    <button class="font-btn" data-font="'Cormorant Garamond', serif">
+                        <span style="font-family: 'Cormorant Garamond', serif; font-size: 16px;">Cormorant</span>
+                        <span class="check">✓</span>
+                    </button>
+                    <button class="font-btn" data-font="'Playfair Display', serif">
+                        <span style="font-family: 'Playfair Display', serif; font-size: 16px;">Playfair</span>
+                        <span class="check">✓</span>
+                    </button>
+                    <button class="font-btn" data-font="Georgia, serif">
+                        <span style="font-family: Georgia, serif; font-size: 16px;">Georgia</span>
+                        <span class="check">✓</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-label">Text Size</div>
+                <div class="size-control">
+                    <button class="size-btn" id="sizeDown">A−</button>
+                    <span class="size-value" id="sizeValue">18px</span>
+                    <button class="size-btn" id="sizeUp">A+</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-label">Line Spacing</div>
+                <div class="spacing-options">
+                    <button class="spacing-btn" data-spacing="1.6">Compact</button>
+                    <button class="spacing-btn active" data-spacing="1.9">Normal</button>
+                    <button class="spacing-btn" data-spacing="2.2">Relaxed</button>
+                    <button class="spacing-btn" data-spacing="2.5">Spacious</button>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-label">Navigation</div>
+                <button class="font-btn" id="gotoPageBtn" style="justify-content: center;">
+                    <span>📄 Go to Page</span>
+                </button>
+            </div>
+
+            <div class="setting-group">
+                <div class="setting-label">Table of Contents</div>
+                <ul class="toc-list" id="tocList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Import Modal -->
+    <div class="pdf-modal-overlay" id="pdfModal">
+        <div class="pdf-modal">
+            <div class="pdf-modal-header">
+                <h2 class="pdf-modal-title">Import PDF</h2>
+                <button class="pdf-modal-close" id="pdfModalClose">✕</button>
+            </div>
+
+            <div class="pdf-drop-zone" id="pdfDropZone">
+                <input type="file" accept=".pdf" id="pdfFileInput">
+                <span class="pdf-drop-icon">📄</span>
+                <div class="pdf-drop-text">Drop your PDF here</div>
+                <div class="pdf-drop-subtext">or click to browse files</div>
+                <button class="pdf-browse-btn">Choose PDF</button>
+            </div>
+
+            <div class="pdf-processing" id="pdfProcessing">
+                <div class="pdf-spinner"></div>
+                <div class="pdf-progress-text" id="pdfProgressText">Reading PDF...</div>
+                <div class="pdf-progress-bar">
+                    <div class="pdf-progress-bar-fill" id="pdfProgressBar"></div>
+                </div>
+            </div>
+
+            <div class="pdf-pages-preview" id="pdfPagesPreview">
+                <div class="pdf-pages-header">
+                    <span class="pdf-pages-count">Found <strong id="pdfPageCount">0</strong> pages</span>
+                </div>
+                <div class="pdf-page-chunks" id="pdfPageChunks"></div>
+            </div>
+
+            <div class="pdf-info-form" id="pdfInfoForm">
+                <div class="pdf-form-group">
+                    <label class="pdf-form-label">Book Title</label>
+                    <input type="text" class="pdf-form-input" id="pdfTitle" placeholder="Enter book title...">
+                </div>
+                <div class="pdf-form-row">
+                    <div class="pdf-form-group">
+                        <label class="pdf-form-label">Author</label>
+                        <input type="text" class="pdf-form-input" id="pdfAuthor" placeholder="Author name...">
+                    </div>
+                    <div class="pdf-form-group">
+                        <label class="pdf-form-label">Pages per Spread</label>
+                        <select class="pdf-form-input" id="pdfPagesPerSpread">
+                            <option value="1">1 page (single)</option>
+                            <option value="2" selected>2 pages (book spread)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="pdf-import-btn" id="pdfImportBtn">Add to Library</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+
+    <!-- JavaScript Modules -->
+    <script src="js/book-data.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/book-renderer.js"></script>
+    <script src="js/pdf-import.js"></script>
+    <script src="js/interactions.js"></script>
+</body>
+</html>
