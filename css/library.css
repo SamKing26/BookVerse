@@ -1,0 +1,326 @@
+/* ========================================
+   LIBRARY / THEME SELECTION PAGE
+   ======================================== */
+.library-page {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(13, 10, 7, 0.45);
+    z-index: 1900;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.library-page.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.library-page.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Library background */
+.library-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.library-bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+
+.library-page.visible .library-bg-video {
+    opacity: 1;
+}
+
+.library-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(13, 10, 7, 0.4) 0%, rgba(13, 10, 7, 1) 100%);
+}
+
+/* Library header */
+.library-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    padding: 0 80px;
+    z-index: 10;
+}
+
+.library-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    color: #d4a853;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Themes row */
+.themes-row {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    margin-top: 100px;
+}
+
+/* Theme card */
+.theme-card {
+    width: 240px;
+    height: 320px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    flex-shrink: 0;
+}
+
+.theme-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.13);
+    pointer-events: none;
+}
+
+.theme-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.theme-card.active {
+    border: 3px solid #d4a853;
+}
+
+/* Theme card background image */
+.theme-card-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+/* Theme card active badge */
+.theme-card-badge {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    width: 24px;
+    height: 24px;
+    background: #d4a853;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s ease;
+}
+
+.theme-card.active .theme-card-badge {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.theme-card-badge img {
+    width: 12.8px;
+    height: 12.8px;
+}
+
+/* Theme card accent line */
+.theme-card-accent {
+    width: 24px;
+    height: 2px;
+    opacity: 0.8;
+    position: relative;
+    z-index: 2;
+}
+
+/* Theme card text */
+.theme-card-info {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.theme-card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: white;
+    line-height: 1.3;
+}
+
+.theme-card-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+}
+
+/* Ivory theme card uses dark text */
+.theme-card.ivory .theme-card-name {
+    color: #1a1a1a;
+}
+
+.theme-card.ivory .theme-card-subtitle {
+    color: rgba(26, 26, 26, 0.6);
+}
+
+/* Library footer action */
+.library-footer {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.library-enter-btn {
+    padding: 16px 48px;
+    background: #d4a853;
+    border: none;
+    border-radius: 100px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0d0a07;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.library-enter-btn:hover {
+    background: #e0b86a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(212, 168, 83, 0.3);
+}
+
+.library-enter-hint {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Library bottom gradient */
+.library-bottom-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 240px;
+    background: linear-gradient(to bottom, rgba(13, 10, 7, 0) 0%, #0d0a07 100%);
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .themes-row {
+        gap: 24px;
+    }
+
+    .theme-card {
+        width: 200px;
+        height: 280px;
+        padding: 18px;
+    }
+
+    .theme-card-name {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .themes-row {
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .library-header {
+        padding: 0 24px;
+        height: 80px;
+    }
+
+    .library-brand {
+        font-size: 24px;
+    }
+
+    .themes-row {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 40px;
+        padding: 0 20px;
+        max-width: 100%;
+    }
+
+    .theme-card {
+        width: 150px;
+        height: 200px;
+        padding: 14px;
+    }
+
+    .theme-card-name {
+        font-size: 16px;
+    }
+
+    .theme-card-subtitle {
+        font-size: 10px;
+    }
+
+    .library-footer {
+        bottom: 40px;
+    }
+
+    .library-enter-btn {
+        padding: 14px 36px;
+        font-size: 13px;
+    }
+
+    .library-enter-hint {
+        font-size: 12px;
+    }
+}

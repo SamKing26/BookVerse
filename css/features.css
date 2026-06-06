@@ -224,17 +224,18 @@
    ======================================== */
 .tts-bar {
     position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 68px;
+    right: 20px;
     display: none;
     align-items: center;
-    gap: 12px;
-    padding: 10px 20px;
-    background: var(--bg-light);
-    border: 1px solid rgba(245, 239, 230, 0.1);
-    border-radius: 30px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    gap: 10px;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
     z-index: 40;
     animation: popupIn 0.3s ease;
 }
@@ -308,14 +309,16 @@
 
 .voice-picker {
     position: absolute;
-    bottom: 100%;
+    top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    margin-bottom: 10px;
+    margin-top: 8px;
     width: 260px;
     max-height: 320px;
-    background: var(--bg-light);
-    border: 1px solid rgba(245, 239, 230, 0.12);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0,0,0,0.5);
     z-index: 100;
@@ -773,7 +776,7 @@ body.focus-mode .reading-area:hover .bookmark-indicator {
 }
 
 .pdf-import-btn:hover {
-    background: var(--cream);
+    background: var(--accent);
     transform: translateY(-1px);
 }
 

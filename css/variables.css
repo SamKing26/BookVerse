@@ -4,22 +4,16 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-    /* Paper themes */
-    --paper-day: #f8f4eb;
-    --paper-sepia: #f1e8d5;
-    --paper-night: #1a1a1a;
-    --paper-dark: #0d0d0d;
-
-    /* Current theme */
-    --paper: var(--paper-sepia);
-    --text: #2c1810;
-    --text-muted: #6b5b4e;
-    --accent: #8b4513;
-    --accent-light: #c4956a;
-    --bg: #1a1410;
-    --bg-light: #2a2118;
-    --ui-text: #f5efe6;
-    --ui-muted: rgba(245, 239, 230, 0.5);
+    /* Default theme (amber) — overridden by theme classes */
+    --paper: rgba(26, 20, 8, 0.95);
+    --text: #f0e8d4;
+    --text-muted: rgba(212, 168, 83, 0.6);
+    --accent: #d4a853;
+    --accent-light: #e0b86a;
+    --bg: #1a1408;
+    --bg-light: rgba(26, 20, 8, 0.4);
+    --ui-text: #ffffff;
+    --ui-muted: rgba(255, 255, 255, 0.6);
 
     /* Book dimensions */
     --book-width: 580px;
@@ -30,6 +24,7 @@
     --font-serif: 'EB Garamond', 'Cormorant Garamond', serif;
     --font-display: 'Playfair Display', serif;
     --font-ui: 'Inter', sans-serif;
+    --page-font: 'EB Garamond', serif;
 
     /* Reading settings */
     --font-size: 18px;
@@ -45,4 +40,29 @@ body {
     height: 100vh;
     width: 100vw;
     user-select: none;
+}
+
+/* ========================================
+   APP LAYOUT (Figma Design)
+   ======================================== */
+#app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+#app.visible {
+    opacity: 1;
+}
+
+/* Hide old sidebar (replaced by reader-sidebar) */
+.sidebar {
+    display: none !important;
+}
+
+/* Hide old reading area (replaced by reader-pane) */
+.reading-area {
+    display: none !important;
 }

@@ -16,22 +16,55 @@ function setupEventListeners() {
     on('prevPage', 'click', prevPage);
     on('nextPage', 'click', nextPage);
 
-    // Toolbar
-    on('toggleSidebar', 'click', () => {
-        document.getElementById('sidebar').classList.toggle('collapsed');
+    // Sidebar toggle (close button in sidebar)
+    on('closeSidebar', 'click', () => {
+        document.getElementById('readerSidebar').classList.add('collapsed');
     });
 
-    on('toggleSettings', 'click', () => {
+    // Sidebar toggle (button in toolbar)
+    on('toggleSidebarBtn', 'click', () => {
+        document.getElementById('readerSidebar').classList.remove('collapsed');
+    });
+
+    // Side navigation arrows
+    on('navLeft', 'click', prevPage);
+    on('navRight', 'click', nextPage);
+
+    // Bookmark button
+    on('addBookmark', 'click', () => {
+        toggleBookmark();
+        updateBookmarkBtn();
+    });
+
+    // Settings panel toggle
+    on('readerSettingsBtn', 'click', () => {
         document.getElementById('settingsPanel').classList.toggle('collapsed');
     });
 
-    on('toggleToc', 'click', () => {
-        document.getElementById('settingsPanel').classList.remove('collapsed');
+    // Font size controls (toolbar)
+    on('sizeUp', 'click', () => setFontSize(fontSize + 1));
+    on('sizeDown', 'click', () => setFontSize(fontSize - 1));
+
+    // Font size controls (settings panel)
+    on('settingsSizeUp', 'click', () => setFontSize(fontSize + 1));
+    on('settingsSizeDown', 'click', () => setFontSize(fontSize - 1));
+
+    // Fonts
+    document.querySelectorAll('.font-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.dataset.font) {
+                setFont(btn.dataset.font);
+            }
+        });
     });
 
-    on('addBookmark', 'click', toggleBookmark);
+    // Line spacing
+    document.querySelectorAll('.spacing-btn').forEach(btn => {
+        btn.addEventListener('click', () => setLineSpacing(btn.dataset.spacing));
+    });
 
-    on('toggleFullscreen', 'click', () => {
+    // Fullscreen toggle
+    on('fullscreenBtn', 'click', () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
         } else {
@@ -39,37 +72,60 @@ function setupEventListeners() {
         }
     });
 
-    // Themes
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.addEventListener('click', () => setTheme(btn.dataset.theme));
+    // Auto-hide navbar in fullscreen
+    let hideTimeout = null;
+
+    function showToolbar() {
+        const bottomNav = document.querySelector('.reader-bottom-nav');
+        const sideNavs = document.querySelectorAll('.reader-nav-side');
+        const sidebar = document.getElementById('readerSidebar');
+        if (bottomNav) bottomNav.style.opacity = '1';
+        sideNavs.forEach(el => el.style.opacity = '1');
+        if (sidebar) sidebar.style.transform = '';
+
+        clearTimeout(hideTimeout);
+        if (document.fullscreenElement) {
+            hideTimeout = setTimeout(() => {
+                if (bottomNav) bottomNav.style.opacity = '0';
+                sideNavs.forEach(el => el.style.opacity = '0');
+                if (sidebar && !sidebar.classList.contains('collapsed')) {
+                    sidebar.style.transform = 'translateX(-280px)';
+                }
+            }, 3000);
+        }
+    }
+
+    document.addEventListener('mousemove', showToolbar);
+    document.addEventListener('touchstart', showToolbar);
+
+    document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+            // Enter fullscreen — hide sidebar immediately, others after 3s
+            const sidebar = document.getElementById('readerSidebar');
+            if (sidebar && !sidebar.classList.contains('collapsed')) {
+                sidebar.classList.add('collapsed');
+            }
+            showToolbar();
+        } else {
+            // Exit fullscreen — show everything
+            const toolbar = document.querySelector('.reader-toolbar');
+            const bottomNav = document.querySelector('.reader-bottom-nav');
+            const sideNavs = document.querySelectorAll('.reader-nav-side');
+            const sidebar = document.getElementById('readerSidebar');
+            if (toolbar) { toolbar.style.opacity = ''; }
+            if (bottomNav) { bottomNav.style.opacity = ''; }
+            sideNavs.forEach(el => { el.style.opacity = ''; });
+            if (sidebar) { sidebar.classList.remove('collapsed'); sidebar.style.transform = ''; }
+            clearTimeout(hideTimeout);
+        }
     });
-
-    // Fonts
-    document.querySelectorAll('.font-btn').forEach(btn => {
-        btn.addEventListener('click', () => setFont(btn.dataset.font));
-    });
-
-    // Font size
-    on('sizeUp', 'click', () => setFontSize(fontSize + 1));
-    on('sizeDown', 'click', () => setFontSize(fontSize - 1));
-
-    // Line spacing
-    document.querySelectorAll('.spacing-btn').forEach(btn => {
-        btn.addEventListener('click', () => setLineSpacing(btn.dataset.spacing));
-    });
-
-    // Mouse wheel page turn
-    on('readingArea', 'wheel', (e) => {
-        if (e.deltaY > 30) nextPage();
-        else if (e.deltaY < -30) prevPage();
-    }, { passive: true });
 
     // Touch swipe
     let touchStartX = 0;
-    on('readingArea', 'touchstart', (e) => {
+    on('readerScroll', 'touchstart', (e) => {
         touchStartX = e.touches[0].clientX;
     });
-    on('readingArea', 'touchend', (e) => {
+    on('readerScroll', 'touchend', (e) => {
         const diff = touchStartX - e.changedTouches[0].clientX;
         if (Math.abs(diff) > 50) {
             if (diff > 0) nextPage();
@@ -78,17 +134,17 @@ function setupEventListeners() {
     });
 
     // Sidebar Search
-    on('searchInput', 'input', (e) => {
+    on('readerSearchInput', 'input', (e) => {
         const query = e.target.value.toLowerCase();
-        document.querySelectorAll('.book-item').forEach(item => {
-            const title = item.querySelector('.book-title-text').textContent.toLowerCase();
-            const author = item.querySelector('.book-author-text').textContent.toLowerCase();
+        document.querySelectorAll('.reader-book-item').forEach(item => {
+            const title = item.querySelector('.reader-book-title').textContent.toLowerCase();
+            const author = item.querySelector('.reader-book-author').textContent.toLowerCase();
             item.style.display = (title.includes(query) || author.includes(query)) ? 'flex' : 'none';
         });
     });
 
-    // Sidebar Import Button
-    on('sidebarImportBtn', 'click', () => {
+    // Import Button
+    on('readerImportBtn', 'click', () => {
         document.getElementById('pdfModal').classList.add('active');
     });
 
@@ -116,9 +172,6 @@ function setupEventListeners() {
             document.getElementById('gotoModal').classList.remove('visible');
         }
     });
-
-    // Focus Mode
-    on('focusModeBtn', 'click', toggleFocusMode);
 
     // TTS
     on('ttsBtn', 'click', () => {
@@ -165,7 +218,7 @@ function setupEventListeners() {
         ttsSpeed = parseInt(e.target.value) / 100;
         document.getElementById('ttsSpeedValue').textContent = ttsSpeed.toFixed(1) + 'x';
         if (ttsPlaying) {
-            ttsGeneration++; // kill old callbacks
+            ttsGeneration++;
             speechSynthesis.cancel();
             setTimeout(() => speakCurrentPage(), 50);
         }
@@ -183,7 +236,6 @@ function setupEventListeners() {
         }
     });
 
-    // Close voice picker when clicking outside
     document.addEventListener('click', (e) => {
         const picker = document.getElementById('voicePicker');
         if (!e.target.closest('.tts-voice-wrapper')) {
@@ -219,11 +271,10 @@ function setupEventListeners() {
         }
     });
 
-    // Load voices and auto-select best one
+    // Load voices
     speechSynthesis.onvoiceschanged = () => {
         const voices = getVoices();
         if (voices.length > 0) {
-            console.log('Available voices:', voices.map(v => v.name));
             autoSelectBestVoice();
         }
     };
@@ -285,7 +336,6 @@ function setupEventListeners() {
             clearSearch();
         }
     });
-
 }
 
 function populateVoicePicker() {
@@ -297,81 +347,78 @@ function populateVoicePicker() {
         return;
     }
 
-    const femaleKeywords = ['female', 'samantha', 'zira', 'hazel', 'karen', 'moira', 'tessa', 'susan', 'fiona', 'alice', 'virginia', 'sabina', 'catherine', 'kate', 'daniel', 'veena', 'heera', 'rishi'];
+    const femaleKeywords = ['female', 'samantha', 'zira', 'hazel', 'karen', 'moira', 'tessa', 'susan', 'fiona', 'alice', 'virginia', 'sabina', 'catherine', 'kate', 'veena', 'heera', 'rishi'];
+    const maleKeywords = ['male', 'david', 'mark', 'james', 'daniel', 'richard', 'george', 'arthur', 'tony', 'guy', 'liam', 'noah', 'matthew'];
 
     const female = [];
     const male = [];
-    const other = [];
 
     allVoices.forEach((v, i) => {
         const name = v.name.toLowerCase();
         const isFem = femaleKeywords.some(k => name.includes(k));
+        const isMale = maleKeywords.some(k => name.includes(k));
         const entry = { voice: v, globalIndex: i };
 
         if (isFem) female.push(entry);
-        else if (name.includes('male') || name.includes('david') || name.includes('mark') || name.includes('james') || name.includes('daniel') || name.includes('richard') || name.includes('george') || name.includes('arthur') || name.includes('tony') || name.includes('guy') || name.includes('liam') || name.includes('noah') || name.includes('matthew')) male.push(entry);
-        else other.push(entry);
+        else if (isMale) male.push(entry);
     });
+
+    // Limit to 3 each, fill from remaining if needed
+    const femaleLimited = female.slice(0, 3);
+    const maleLimited = male.slice(0, 3);
+
+    // If we don't have enough, fill from 'other' voices
+    if (femaleLimited.length < 3 || maleLimited.length < 3) {
+        const used = new Set([...femaleLimited, ...maleLimited].map(e => e.globalIndex));
+        const others = allVoices
+            .map((v, i) => ({ voice: v, globalIndex: i }))
+            .filter(e => !used.has(e.globalIndex));
+
+        for (const o of others) {
+            if (femaleLimited.length < 3) femaleLimited.push(o);
+            else if (maleLimited.length < 3) maleLimited.push(o);
+            if (femaleLimited.length >= 3 && maleLimited.length >= 3) break;
+        }
+    }
 
     let html = '';
 
-    if (female.length > 0) {
-        html += '<div class="voice-group-label">👩 Female</div>';
-        female.forEach(({ voice, globalIndex }) => {
-            const active = globalIndex === ttsVoiceIndex ? ' active' : '';
-            const shortName = voice.name.replace('Microsoft ', '').replace('Google ', '');
-            html += `<div class="voice-option${active}" data-index="${globalIndex}">
-                <span class="voice-option-icon">👩</span>
-                <span class="voice-option-name">${shortName}</span>
-                <span class="voice-option-check">✓</span>
-            </div>`;
-        });
-    }
+    html += '<div class="voice-group-label">👩 Female Voices</div>';
+    femaleLimited.forEach(({ voice, globalIndex }) => {
+        const active = globalIndex === ttsVoiceIndex ? ' active' : '';
+        const shortName = voice.name.replace('Microsoft ', '').replace('Google ', '').split(' ').slice(0, 2).join(' ');
+        html += `<div class="voice-option${active}" data-index="${globalIndex}">
+            <span class="voice-option-icon">👩</span>
+            <span class="voice-option-name">${shortName}</span>
+            <span class="voice-option-check">✓</span>
+        </div>`;
+    });
 
-    if (male.length > 0) {
-        html += '<div class="voice-group-label">🧑 Male</div>';
-        male.forEach(({ voice, globalIndex }) => {
-            const active = globalIndex === ttsVoiceIndex ? ' active' : '';
-            const shortName = voice.name.replace('Microsoft ', '').replace('Google ', '');
-            html += `<div class="voice-option${active}" data-index="${globalIndex}">
-                <span class="voice-option-icon">🧑</span>
-                <span class="voice-option-name">${shortName}</span>
-                <span class="voice-option-check">✓</span>
-            </div>`;
-        });
-    }
-
-    if (other.length > 0) {
-        html += '<div class="voice-group-label">🔊 Other</div>';
-        other.forEach(({ voice, globalIndex }) => {
-            const active = globalIndex === ttsVoiceIndex ? ' active' : '';
-            const shortName = voice.name.replace('Microsoft ', '').replace('Google ', '');
-            html += `<div class="voice-option${active}" data-index="${globalIndex}">
-                <span class="voice-option-icon">🔊</span>
-                <span class="voice-option-name">${shortName}</span>
-                <span class="voice-option-check">✓</span>
-            </div>`;
-        });
-    }
+    html += '<div class="voice-group-label">🧑 Male Voices</div>';
+    maleLimited.forEach(({ voice, globalIndex }) => {
+        const active = globalIndex === ttsVoiceIndex ? ' active' : '';
+        const shortName = voice.name.replace('Microsoft ', '').replace('Google ', '').split(' ').slice(0, 2).join(' ');
+        html += `<div class="voice-option${active}" data-index="${globalIndex}">
+            <span class="voice-option-icon">🧑</span>
+            <span class="voice-option-name">${shortName}</span>
+            <span class="voice-option-check">✓</span>
+        </div>`;
+    });
 
     list.innerHTML = html;
 
-    // Click handlers for each voice
     list.querySelectorAll('.voice-option').forEach(opt => {
         opt.addEventListener('click', () => {
             const idx = parseInt(opt.dataset.index);
             ttsVoiceIndex = idx;
 
-            // Update button label
             const voice = allVoices[idx];
             const isFem = femaleKeywords.some(k => voice.name.toLowerCase().includes(k));
             const shortName = voice.name.replace('Microsoft ', '').replace('Google ', '').split(' ').slice(0, 2).join(' ');
             document.getElementById('ttsVoiceBtn').textContent = (isFem ? '👩 ' : '🧑 ') + shortName;
 
-            // Close picker
             document.getElementById('voicePicker').classList.remove('open');
 
-            // Restart speech with new voice
             if (ttsPlaying) {
                 ttsGeneration++;
                 speechSynthesis.cancel();
@@ -394,6 +441,9 @@ function updateVolumeIcon() {
 // ==========================================
 function setupKeyboard() {
     document.addEventListener('keydown', (e) => {
+        // Don't handle shortcuts when in hero/library pages
+        if (typeof currentPage !== 'undefined' && currentPage !== 'reader') return;
+
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
 
         switch (e.key) {
@@ -431,11 +481,10 @@ function setupKeyboard() {
                 break;
             case 'Escape':
                 document.getElementById('settingsPanel').classList.add('collapsed');
-                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('readerSidebar').classList.add('collapsed');
                 document.getElementById('searchBar').classList.remove('visible');
                 document.getElementById('gotoModal').classList.remove('visible');
                 document.getElementById('dictPopup').classList.remove('visible');
-                toggleFocusMode();
                 break;
         }
     });
@@ -446,25 +495,25 @@ function setupKeyboard() {
 // ==========================================
 function init() {
     cacheDOMElements();
+    loadBookmarks();
+    loadLastPosition();
     renderBookList();
     loadBook(currentBook);
+    renderBookmarksList();
     setupEventListeners();
     setupKeyboard();
     setupReadingStats();
     setupPdfImport();
 
-    // Preloader
-    setTimeout(() => {
-        document.getElementById('preloader').classList.add('hidden');
-        document.getElementById('app').classList.add('visible');
-    }, 2500);
+    // Apply saved theme
+    applyReaderTheme(currentTheme);
 }
 
 // Start the app when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        try { init(); } catch(e) { console.error('Init error:', e); document.getElementById('preloader').innerHTML = '<p style="color:red;padding:20px;">Error: ' + e.message + '</p>'; }
+        try { init(); } catch(e) { console.error('Init error:', e); }
     });
 } else {
-    try { init(); } catch(e) { console.error('Init error:', e); document.getElementById('preloader').innerHTML = '<p style="color:red;padding:20px;">Error: ' + e.message + '</p>'; }
+    try { init(); } catch(e) { console.error('Init error:', e); }
 }

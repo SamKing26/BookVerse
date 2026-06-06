@@ -1,444 +1,52 @@
 /* ========================================
-   BOOK — 3D PAGE TURN
+   BOOK — Legacy styles (kept for compatibility)
+   ========================================
+   The new reader uses themes.css for layout.
+   This file is kept for backward compatibility
+   with any code that references these classes.
    ======================================== */
+
+/* Hide old book container */
 .book-container {
-    perspective: 1800px;
-    width: var(--book-width);
-    height: var(--book-height);
-    position: relative;
+    display: none !important;
 }
 
-.book {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-    transform: rotateY(0deg);
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-/* Book shadow */
-.book-shadow {
-    position: absolute;
-    bottom: -20px;
-    left: 10%;
-    width: 80%;
-    height: 30px;
-    background: radial-gradient(ellipse, rgba(0,0,0,0.4), transparent);
-    filter: blur(15px);
-    z-index: -1;
-}
-
-/* Pages */
-.page {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: var(--paper);
-    border-radius: 0 4px 4px 0;
-    padding: var(--page-padding);
-    overflow: hidden;
-    box-shadow: 2px 2px 15px rgba(0,0,0,0.2);
-}
-
-.page::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0;
-    width: 30px; height: 100%;
-    background: linear-gradient(90deg, rgba(0,0,0,0.06), transparent);
-    pointer-events: none;
-}
-
-/* Paper texture overlay */
-.page::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    opacity: 0.5;
-}
-
-/* Left page (even) */
-.page-left {
-    border-radius: 4px 0 0 4px;
-    transform-origin: right center;
-}
-
-.page-left::before {
-    left: auto;
-    right: 0;
-    background: linear-gradient(270deg, rgba(0,0,0,0.04), transparent);
-}
-
-/* Right page (odd) */
-.page-right {
-    transform-origin: left center;
-}
-
-/* Page content */
-.page-content {
-    position: relative;
-    z-index: 2;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    color: var(--text);
-}
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(44, 24, 16, 0.08);
-}
-
-.page-chapter {
-    font-family: var(--font-ui);
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-}
-
-.page-number {
-    font-family: var(--font-ui);
-    font-size: 11px;
-    color: var(--text-muted);
-}
-
-/* Chapter title */
-.chapter-title {
-    font-family: var(--font-display);
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--accent);
-    margin-bottom: 8px;
-    line-height: 1.2;
-}
-
-.chapter-subtitle {
-    font-family: var(--font-serif);
-    font-size: 16px;
-    font-style: italic;
-    color: var(--text-muted);
-    margin-bottom: 28px;
-}
-
-/* Drop cap */
-.drop-cap::first-letter {
-    float: left;
-    font-family: var(--font-display);
-    font-size: 72px;
-    font-weight: 700;
-    line-height: 0.8;
-    padding: 0 12px 0 0;
-    color: var(--accent);
-}
-
-/* Paragraphs */
-.page-text {
-    font-family: var(--font-serif);
-    font-size: var(--font-size);
-    line-height: var(--line-height);
-    letter-spacing: var(--letter-spacing);
-    color: var(--text);
-    text-align: justify;
-    hyphens: auto;
-}
-
-.page-text p {
-    margin-bottom: 1.2em;
-    text-indent: 0;
-}
-
-.page-text p + p {
-    text-indent: 1.5em;
-}
-
-.page-text p:first-child {
-    text-indent: 0;
-}
-
-/* Tighter spacing for imported PDF books */
-.page-text.imported-text p {
-    margin-bottom: 0.65em;
-}
-
-.page-text.imported-text p + p {
-    text-indent: 1.2em;
-}
-
-/* Quote block */
-.book-quote {
-    margin: 24px 0;
-    padding: 20px 24px;
-    border-left: 3px solid var(--accent-light);
-    background: rgba(139, 69, 19, 0.04);
-    font-style: italic;
-    font-size: calc(var(--font-size) - 1px);
-}
-
-.book-quote cite {
-    display: block;
-    margin-top: 8px;
-    font-size: 13px;
-    color: var(--text-muted);
-    font-style: normal;
-}
-
-/* Divider */
-.page-divider {
-    text-align: center;
-    margin: 30px 0;
-    color: var(--text-muted);
-    font-size: 18px;
-    letter-spacing: 8px;
-}
-
-/* Page footer */
-.page-footer {
-    margin-top: auto;
-    padding-top: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.page-footer-line {
-    flex: 1;
-    height: 1px;
-    background: rgba(44, 24, 16, 0.08);
-}
-
-.page-footer .page-number {
-    margin: 0 16px;
-}
-
-/* ========================================
-   PAGE TURN EDGES (3D effect)
-   ======================================== */
-.page-edge {
-    position: absolute;
-    top: 0;
-    width: 8px;
-    height: 100%;
-    z-index: 5;
-}
-
-.page-edge-left {
-    left: -6px;
-    background: linear-gradient(90deg,
-        rgba(0,0,0,0.1),
-        rgba(0,0,0,0.05) 40%,
-        rgba(255,255,255,0.05) 60%,
-        rgba(0,0,0,0.02)
-    );
-    border-radius: 4px 0 0 4px;
-}
-
-.page-edge-right {
-    right: -4px;
-    background: linear-gradient(90deg,
-        rgba(0,0,0,0.02),
-        rgba(255,255,255,0.05) 40%,
-        rgba(0,0,0,0.05) 60%,
-        rgba(0,0,0,0.08)
-    );
-    border-radius: 0 4px 4px 0;
-}
-
-/* ========================================
-   NAVIGATION ARROWS
-   ======================================== */
+/* Hide old navigation arrows */
 .nav-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(245, 239, 230, 0.08);
-    border: 1px solid rgba(245, 239, 230, 0.1);
-    border-radius: 50%;
-    color: var(--ui-text);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 30;
-    font-size: 20px;
-    opacity: 0;
+    display: none !important;
 }
 
-.reading-area:hover .nav-arrow { opacity: 1; }
-
-.nav-arrow:hover {
-    background: var(--accent-light);
-    color: var(--bg);
-    transform: translateY(-50%) scale(1.1);
-}
-
-.nav-prev { left: -80px; }
-.nav-next { right: -80px; }
-
-.nav-arrow:disabled {
-    opacity: 0.2 !important;
-    cursor: default;
-    pointer-events: none;
-}
-
-/* ========================================
-   READING PROGRESS BAR
-   ======================================== */
+/* Hide old reading progress */
 .reading-progress {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: rgba(245, 239, 230, 0.05);
-    z-index: 40;
+    display: none !important;
 }
 
-.reading-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
-    transition: width 0.5s ease;
-    width: 0%;
-}
-
-/* ========================================
-   BOOKMARK INDICATOR
-   ======================================== */
-.bookmark-indicator {
-    position: absolute;
-    top: 0;
-    right: 40px;
-    width: 24px;
-    height: 40px;
-    z-index: 20;
-}
-
-.bookmark-flag {
-    width: 100%;
-    height: 100%;
-    background: var(--accent);
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-    cursor: pointer;
-}
-
-.bookmark-indicator.active .bookmark-flag {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.bookmark-indicator:hover .bookmark-flag {
-    background: var(--accent-light);
-}
-
-/* ========================================
-   KEYBOARD HINTS
-   ======================================== */
+/* Hide old keyboard hints */
 .keyboard-hints {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 20px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    display: none !important;
 }
 
-.reading-area:hover .keyboard-hints { opacity: 0.4; }
-
-.key-hint {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--ui-muted);
-}
-
-.key {
-    padding: 3px 8px;
-    background: rgba(245, 239, 230, 0.08);
-    border-radius: 4px;
-    font-family: var(--font-ui);
-    font-size: 10px;
-}
-
-/* ========================================
-   READING STATS
-   ======================================== */
+/* Hide old reading stats */
 .reading-stats {
-    position: absolute;
-    bottom: 12px; left: 12px;
-    display: flex;
-    gap: 16px;
-    font-family: var(--font-ui);
-    font-size: 11px;
-    color: var(--ui-muted);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 30;
+    display: none !important;
 }
 
-.reading-area:hover .reading-stats { opacity: 0.6; }
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.stat-value {
-    color: var(--accent-light);
-    font-weight: 500;
+/* Hide old bookmark indicator */
+.bookmark-indicator {
+    display: none !important;
 }
 
 /* ========================================
-   READING TIMER BADGE
-   ======================================== */
-.timer-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 6px 12px;
-    background: rgba(0,0,0,0.3);
-    backdrop-filter: blur(8px);
-    border-radius: 20px;
-    font-family: var(--font-ui);
-    font-size: 11px;
-    color: var(--ui-muted);
-    display: none;
-    z-index: 30;
-    letter-spacing: 1px;
-}
-
-.timer-badge.visible { display: block; }
-
-/* ========================================
-   RESPONSIVE
+   RESPONSIVE (minimal overrides)
    ======================================== */
 @media (max-width: 1200px) {
-    .sidebar { position: absolute; }
-    .nav-prev { left: 10px; }
-    .nav-next { right: 10px; }
+    .reader-sidebar {
+        position: absolute;
+    }
 }
 
 @media (max-width: 768px) {
-    :root {
-        --book-width: 100vw;
-        --book-height: 100vh;
-        --page-padding: 24px;
+    .reader-sidebar {
+        display: none;
     }
-
-    .sidebar { display: none; }
-    .toolbar { opacity: 1; }
 }

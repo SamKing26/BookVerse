@@ -1,26 +1,28 @@
 // ==========================================
-// DOM ELEMENTS (lazy — set on init)
+// BOOK RENDERER — Figma Design Layout
 // ==========================================
-let pageLeft, pageRight, leftContent, rightContent;
-let leftChapter, rightChapter, leftPageNum, rightPageNum;
-let leftFooterNum, rightFooterNum, progressFill;
-let toolbarTitle, bookList, tocList, bookmarkIndicator;
+// Renders books in the new single-page scroll view
+
+let cardTitle, cardAuthor, cardChapter, cardBody;
+let readerTitle, readerProgressFill, readerProgressText;
+let readerCurrentPage, readerTotalPages, readerBookList;
 
 function cacheDOMElements() {
-    pageLeft = document.getElementById('pageLeft');
-    pageRight = document.getElementById('pageRight');
-    leftContent = document.getElementById('leftContent');
-    rightContent = document.getElementById('rightContent');
-    leftChapter = document.getElementById('leftChapter');
-    rightChapter = document.getElementById('rightChapter');
-    leftPageNum = document.getElementById('leftPageNum');
-    rightPageNum = document.getElementById('rightPageNum');
-    leftFooterNum = document.getElementById('leftFooterNum');
-    rightFooterNum = document.getElementById('rightFooterNum');
-    progressFill = document.getElementById('progressFill');
-    toolbarTitle = document.getElementById('toolbarTitle');
-    bookList = document.getElementById('bookList');
-    tocList = document.getElementById('tocList');
+    // New reader elements
+    cardTitle = document.getElementById('cardTitle');
+    cardAuthor = document.getElementById('cardAuthor');
+    cardChapter = document.getElementById('cardChapter');
+    cardBody = document.getElementById('cardBody');
+    readerTitle = document.getElementById('readerTitle');
+    readerProgressFill = document.getElementById('readerProgressFill');
+    readerProgressText = document.getElementById('readerProgressText');
+    readerCurrentPage = document.getElementById('readerCurrentPage');
+    readerTotalPages = document.getElementById('readerTotalPages');
+    readerBookList = document.getElementById('readerBookList');
+
+    // Legacy elements (still needed for some features)
+    toolbarTitle = document.getElementById('readerTitle');
+    progressFill = document.getElementById('readerProgressFill');
     bookmarkIndicator = document.getElementById('bookmarkIndicator');
 }
 
@@ -31,7 +33,11 @@ function loadBook(book) {
     currentBook = book;
     currentPagePair = 0;
     totalPagePairs = book.chapters.reduce((sum, ch) => sum + ch.pages.length, 0);
-    toolbarTitle.textContent = book.title;
+
+    // Update UI
+    if (readerTitle) readerTitle.textContent = book.title;
+    if (cardTitle) cardTitle.textContent = book.title;
+    if (cardAuthor) cardAuthor.textContent = 'by ' + book.author;
 
     loadLastPosition();
     renderTOC();
@@ -42,45 +48,98 @@ function loadBook(book) {
 }
 
 // ==========================================
-// BOOK LIST
+// BOOK LIST (New reader sidebar)
 // ==========================================
 function renderBookList() {
-    const booksHtml = library.map(book => `
-        <div class="book-item ${book.id === currentBook.id ? 'active' : ''}" data-id="${book.id}">
-            <div class="book-thumb" style="background: ${book.color}">
-                ${book.icon}
+    if (!readerBookList) return;
+
+    const exampleBooks = library.filter(b => !b.isPdf);
+    const importedBooks = library.filter(b => b.isPdf);
+
+    function bookItemHtml(book) {
+        return `
+        <div class="reader-book-item ${book.id === currentBook.id ? 'active' : ''}" data-id="${book.id}">
+            <div class="reader-book-icon">
+                ${book.icon || book.title.charAt(0)}
             </div>
-            <div class="book-info">
-                <div class="book-title-text">${book.title}</div>
-                <div class="book-author-text">${book.author}</div>
+            <div class="reader-book-info">
+                <div class="reader-book-title">${book.title}</div>
+                <div class="reader-book-author">${book.author}</div>
                 ${book.progress > 0 ? `
-                    <div class="book-progress">${book.progress}% complete</div>
-                    <div class="book-progress-bar">
-                        <div class="book-progress-fill" style="width: ${book.progress}%"></div>
+                    <div class="reader-book-progress">
+                        <div class="reader-book-progress-fill" style="width: ${book.progress}%"></div>
                     </div>
-                ` : '<div class="book-progress">Not started</div>'}
+                ` : ''}
             </div>
-        </div>
-    `).join('');
-
-    // Keep the import button, just update the book list
-    const importBtn = bookList.querySelector('#sidebarImportBtn')?.parentElement;
-    bookList.innerHTML = '';
-    if (importBtn) bookList.appendChild(importBtn);
-
-    const sectionTitle = document.createElement('div');
-    sectionTitle.className = 'book-section-title';
-    sectionTitle.textContent = 'Reading Now';
-    bookList.appendChild(sectionTitle);
-
-    const temp = document.createElement('div');
-    temp.innerHTML = booksHtml;
-    while (temp.firstChild) {
-        bookList.appendChild(temp.firstChild);
+            ${book.isPdf ? `<button class="reader-book-delete" data-id="${book.id}" title="Remove from library">✕</button>` : ''}
+        </div>`;
     }
 
-    bookList.querySelectorAll('.book-item').forEach(item => {
-        item.addEventListener('click', () => {
+    // Load collapsed state from localStorage
+    const collapsedFolders = JSON.parse(localStorage.getItem('bookverse_collapsedFolders') || '{}');
+
+    const html = `
+        <div class="book-folder" data-folder="example">
+            <div class="book-folder-header" data-folder="example">
+                <span class="book-folder-chevron ${collapsedFolders.example ? '' : 'open'}">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="book-folder-name">📚 Example Books</span>
+                <span class="book-folder-count">${exampleBooks.length}</span>
+            </div>
+            <div class="book-folder-items ${collapsedFolders.example ? 'collapsed' : ''}">
+                ${exampleBooks.map(bookItemHtml).join('')}
+            </div>
+        </div>
+        <div class="book-folder" data-folder="imported">
+            <div class="book-folder-header" data-folder="imported">
+                <span class="book-folder-chevron ${collapsedFolders.imported ? '' : 'open'}">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span class="book-folder-name">📥 Imported Books</span>
+                <span class="book-folder-count">${importedBooks.length}</span>
+            </div>
+            <div class="book-folder-items ${collapsedFolders.imported ? 'collapsed' : ''}">
+                ${importedBooks.length > 0
+                    ? importedBooks.map(bookItemHtml).join('')
+                    : '<div class="book-folder-empty">No imported books yet</div>'
+                }
+            </div>
+        </div>
+    `;
+
+    // Keep the title, update the list
+    const titleEl = readerBookList.querySelector('.reader-book-list-title');
+    readerBookList.innerHTML = '';
+    if (titleEl) readerBookList.appendChild(titleEl);
+
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    while (temp.firstChild) {
+        readerBookList.appendChild(temp.firstChild);
+    }
+
+    // Folder toggle handlers
+    readerBookList.querySelectorAll('.book-folder-header').forEach(header => {
+        header.addEventListener('click', () => {
+            const folder = header.dataset.folder;
+            const items = header.nextElementSibling;
+            const chevron = header.querySelector('.book-folder-chevron');
+            const isCollapsed = items.classList.toggle('collapsed');
+            chevron.classList.toggle('open', !isCollapsed);
+
+            // Save collapsed state
+            const state = JSON.parse(localStorage.getItem('bookverse_collapsedFolders') || '{}');
+            state[folder] = isCollapsed;
+            localStorage.setItem('bookverse_collapsedFolders', JSON.stringify(state));
+        });
+    });
+
+    // Click handlers for book items
+    readerBookList.querySelectorAll('.reader-book-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            if (e.target.classList.contains('reader-book-delete')) return;
+
             const bookId = parseInt(item.dataset.id);
             const book = library.find(b => b.id === bookId);
             if (book) {
@@ -89,112 +148,152 @@ function renderBookList() {
             }
         });
     });
+
+    // Delete button handlers
+    readerBookList.querySelectorAll('.reader-book-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const bookId = parseInt(btn.dataset.id);
+            const book = library.find(b => b.id === bookId);
+            if (!book) return;
+
+            if (confirm(`Remove "${book.title}" from library?`)) {
+                deleteBook(bookId);
+            }
+        });
+    });
+}
+
+// ==========================================
+// DELETE BOOK
+// ==========================================
+function deleteBook(bookId) {
+    const index = library.findIndex(b => b.id === bookId);
+    if (index === -1) return;
+
+    const wasActive = currentBook && currentBook.id === bookId;
+
+    // Remove from library
+    library.splice(index, 1);
+
+    // Save updated library
+    saveImportedBooks();
+
+    // If we deleted the active book, switch to the first available
+    if (wasActive && library.length > 0) {
+        loadBook(library[0]);
+    }
+
+    // Re-render the book list
+    renderBookList();
 }
 
 // ==========================================
 // TABLE OF CONTENTS
 // ==========================================
 function renderTOC() {
-    let pageNum = 1;
-    tocList.innerHTML = currentBook.chapters.map((ch, i) => {
-        const pageStart = pageNum;
-        pageNum += ch.pages.length * 2;
-        return `
-            <li class="toc-item" data-chapter="${i}">
-                <span>${ch.title}</span>
-                <span class="toc-page">p. ${pageStart}</span>
-            </li>
-        `;
-    }).join('');
+    // TOC is now in the settings panel
+    if (typeof tocList !== 'undefined' && tocList) {
+        let pageNum = 1;
+        tocList.innerHTML = currentBook.chapters.map((ch, i) => {
+            const pageStart = pageNum;
+            pageNum += ch.pages.length;
+            return `
+                <li class="toc-item" data-chapter="${i}">
+                    <span>${ch.title}</span>
+                    <span class="toc-page">p. ${pageStart}</span>
+                </li>
+            `;
+        }).join('');
 
-    tocList.querySelectorAll('.toc-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const chapterIdx = parseInt(item.dataset.chapter);
-            let targetPage = 0;
-            for (let i = 0; i < chapterIdx; i++) {
-                targetPage += currentBook.chapters[i].pages.length;
-            }
-            currentPagePair = targetPage;
-            renderPages();
-            updateProgress();
-            checkBookmark();
+        tocList.querySelectorAll('.toc-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const chapterIdx = parseInt(item.dataset.chapter);
+                let targetPage = 0;
+                for (let i = 0; i < chapterIdx; i++) {
+                    targetPage += currentBook.chapters[i].pages.length;
+                }
+                currentPagePair = targetPage;
+                renderPages();
+                updateProgress();
+                checkBookmark();
+            });
         });
-    });
+    }
 }
 
 // ==========================================
-// RENDER PAGES
+// RENDER PAGES (Single-page scroll view)
 // ==========================================
 function renderPages() {
-    const { leftPage, rightPage, leftCh, rightCh, leftNum, rightNum } = getPageData(currentPagePair);
+    const pageData = getCurrentPageContent();
 
-    leftContent.innerHTML = leftPage || '';
-    rightContent.innerHTML = rightPage || '';
+    // Update page number
+    if (cardChapter) cardChapter.textContent = 'Page ' + (currentPagePair + 1);
 
-    // Add imported-text class for PDF books (tighter spacing)
-    const importClass = currentBook.isPdf ? ' imported-text' : '';
-    leftContent.className = 'page-text' + importClass;
-    rightContent.className = 'page-text' + importClass;
-
-    leftChapter.textContent = leftCh || '';
-    rightChapter.textContent = rightCh || '';
-
-    leftPageNum.textContent = leftNum || '';
-    rightPageNum.textContent = rightNum || '';
-    leftFooterNum.textContent = leftNum || '';
-    rightFooterNum.textContent = rightNum || '';
+    // Update body content
+    if (cardBody) {
+        cardBody.innerHTML = pageData.content || '';
+        // Add imported-text class for PDF books
+        if (currentBook.isPdf) {
+            cardBody.classList.add('imported-text');
+        } else {
+            cardBody.classList.remove('imported-text');
+        }
+    }
 
     applyFontSettings();
 
-    pageLeft.style.opacity = '0';
-    pageRight.style.opacity = '0';
-    pageLeft.style.transform = 'translateX(-10px)';
-    pageRight.style.transform = 'translateX(10px)';
+    // Animate card entrance
+    const card = document.getElementById('readerCard');
+    if (card) {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        requestAnimationFrame(() => {
+            card.style.transition = 'all 0.4s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        });
+    }
 
-    requestAnimationFrame(() => {
-        pageLeft.style.transition = 'all 0.4s ease';
-        pageRight.style.transition = 'all 0.4s ease';
-        pageLeft.style.opacity = '1';
-        pageRight.style.opacity = '1';
-        pageLeft.style.transform = 'translateX(0)';
-        pageRight.style.transform = 'translateX(0)';
-    });
+    // Update navigation state
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+    const navLeft = document.getElementById('navLeft');
+    const navRight = document.getElementById('navRight');
 
-    document.getElementById('prevPage').disabled = currentPagePair <= 0;
-    document.getElementById('nextPage').disabled = currentPagePair >= totalPagePairs - 1;
+    if (prevBtn) prevBtn.style.opacity = currentPagePair <= 0 ? '0.3' : '1';
+    if (nextBtn) nextBtn.style.opacity = currentPagePair >= totalPagePairs - 1 ? '0.3' : '1';
+
+    if (navLeft) navLeft.style.pointerEvents = currentPagePair <= 0 ? 'none' : 'auto';
+    if (navRight) navRight.style.pointerEvents = currentPagePair >= totalPagePairs - 1 ? 'none' : 'auto';
 
     saveLastPosition();
     updateReadingStats();
+
+    // Scroll to top of reading area
+    const scroll = document.getElementById('readerScroll');
+    if (scroll) scroll.scrollTop = 0;
 }
 
-function getPageData(pairIndex) {
+function getCurrentPageContent() {
     let globalIndex = 0;
     for (const chapter of currentBook.chapters) {
         for (let p = 0; p < chapter.pages.length; p++) {
-            if (globalIndex === pairIndex) {
-                const pageNum = (pairIndex * 2) + 1;
+            if (globalIndex === currentPagePair) {
                 return {
-                    leftPage: p > 0 ? chapter.pages[p - 1] : '',
-                    rightPage: chapter.pages[p],
-                    leftCh: p > 0 ? chapter.title : '',
-                    rightCh: chapter.title,
-                    leftNum: p > 0 ? pageNum.toString() : '',
-                    rightNum: (pageNum + 1).toString()
+                    chapter: chapter.title,
+                    content: chapter.pages[p]
                 };
             }
             globalIndex++;
         }
     }
+    // Fallback: return last page
     const lastChapter = currentBook.chapters[currentBook.chapters.length - 1];
-    const lastPage = lastChapter.pages[lastChapter.pages.length - 1];
-    const num = (pairIndex * 2) + 1;
     return {
-        leftPage: lastPage,
-        rightPage: '',
-        leftCh: lastChapter.title,
-        rightCh: '',
-        leftNum: num.toString(),
-        rightNum: (num + 1).toString()
+        chapter: lastChapter.title,
+        content: lastChapter.pages[lastChapter.pages.length - 1]
     };
 }
 
@@ -203,10 +302,6 @@ function getPageData(pairIndex) {
 // ==========================================
 function nextPage() {
     if (currentPagePair < totalPagePairs - 1) {
-        const book = document.getElementById('book');
-        book.style.transform = 'rotateY(-5deg)';
-        setTimeout(() => { book.style.transform = 'rotateY(0deg)'; }, 300);
-
         currentPagePair++;
         renderPages();
         updateProgress();
@@ -216,10 +311,6 @@ function nextPage() {
 
 function prevPage() {
     if (currentPagePair > 0) {
-        const book = document.getElementById('book');
-        book.style.transform = 'rotateY(5deg)';
-        setTimeout(() => { book.style.transform = 'rotateY(0deg)'; }, 300);
-
         currentPagePair--;
         renderPages();
         updateProgress();
@@ -234,7 +325,20 @@ function updateProgress() {
     const progress = totalPagePairs > 0
         ? ((currentPagePair + 1) / totalPagePairs) * 100
         : 0;
-    progressFill.style.width = progress + '%';
+
+    if (readerProgressFill) {
+        readerProgressFill.style.width = progress + '%';
+    }
+    if (readerProgressText) {
+        readerProgressText.textContent = Math.round(progress) + '%';
+    }
+    if (readerCurrentPage) {
+        readerCurrentPage.textContent = currentPagePair + 1;
+    }
+    if (readerTotalPages) {
+        readerTotalPages.textContent = totalPagePairs;
+    }
+
     currentBook.progress = Math.round(progress);
 }
 
@@ -243,7 +347,72 @@ function updateProgress() {
 // ==========================================
 function checkBookmark() {
     const key = `${currentBook.id}-${currentPagePair}`;
-    bookmarkIndicator.classList.toggle('active', bookmarks.has(key));
+    if (bookmarkIndicator) {
+        bookmarkIndicator.classList.toggle('active', bookmarks.has(key));
+    }
+    updateBookmarkBtn();
+}
+
+function renderBookmarksList() {
+    const container = document.getElementById('bookmarksList');
+    if (!container) return;
+
+    if (bookmarks.size === 0) {
+        container.innerHTML = '<div class="bookmarks-empty">No bookmarks yet</div>';
+        return;
+    }
+
+    // Sort by timestamp (newest first)
+    const sorted = [...bookmarks.entries()].sort((a, b) => b[1].timestamp - a[1].timestamp);
+
+    container.innerHTML = sorted.map(([key, data]) => `
+        <div class="bookmark-item" data-key="${key}" data-book-id="${data.bookId}" data-page="${data.page}">
+            <div class="bookmark-item-icon">🔖</div>
+            <div class="bookmark-item-info">
+                <div class="bookmark-item-title">${data.bookTitle || 'Unknown'}</div>
+                <div class="bookmark-item-page">Page ${data.page + 1}</div>
+            </div>
+            <button class="bookmark-item-remove" data-key="${key}">✕</button>
+        </div>
+    `).join('');
+
+    // Click to navigate
+    container.querySelectorAll('.bookmark-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            if (e.target.classList.contains('bookmark-item-remove')) return;
+            const bookId = parseInt(item.dataset.bookId);
+            const page = parseInt(item.dataset.page);
+            const book = library.find(b => b.id === bookId);
+            if (book) {
+                loadBook(book);
+                currentPagePair = page;
+                renderPages();
+                updateProgress();
+                checkBookmark();
+                renderBookList();
+            }
+        });
+    });
+
+    // Remove button
+    container.querySelectorAll('.bookmark-item-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const key = btn.dataset.key;
+            bookmarks.delete(key);
+            saveBookmarks();
+            checkBookmark();
+            renderBookmarksList();
+        });
+    });
+}
+
+function updateBookmarkBtn() {
+    const indicator = document.getElementById('cardBookmarkIndicator');
+    if (!indicator) return;
+    const key = `${currentBook.id}-${currentPagePair}`;
+    const isBookmarked = bookmarks.has(key);
+    indicator.classList.toggle('visible', isBookmarked);
 }
 
 function toggleBookmark() {
@@ -251,45 +420,62 @@ function toggleBookmark() {
     if (bookmarks.has(key)) {
         bookmarks.delete(key);
     } else {
-        bookmarks.add(key);
+        bookmarks.set(key, {
+            bookId: currentBook.id,
+            bookTitle: currentBook.title,
+            page: currentPagePair,
+            timestamp: Date.now()
+        });
     }
+    saveBookmarks();
     checkBookmark();
+    renderBookmarksList();
+}
+
+function saveBookmarks() {
+    const obj = {};
+    bookmarks.forEach((val, key) => { obj[key] = val; });
+    localStorage.setItem('bookverse_bookmarks', JSON.stringify(obj));
+}
+
+function loadBookmarks() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('bookverse_bookmarks') || '{}');
+        bookmarks = new Map();
+        Object.entries(saved).forEach(([key, val]) => {
+            bookmarks.set(key, val);
+        });
+    } catch (e) {
+        bookmarks = new Map();
+    }
 }
 
 // ==========================================
-// THEME
+// THEME (Legacy compatibility)
 // ==========================================
 function setTheme(theme) {
-    currentTheme = theme;
-    const themes = {
-        day: { paper: '#f8f4eb', text: '#2c1810', textMuted: '#6b5b4e' },
-        sepia: { paper: '#f1e8d5', text: '#2c1810', textMuted: '#6b5b4e' },
-        night: { paper: '#1a1a1a', text: '#e8e0d4', textMuted: '#9a8e80' },
-        dark: { paper: '#0d0d0d', text: '#d4ccc0', textMuted: '#7a7068' }
-    };
-
-    const t = themes[theme];
-    document.documentElement.style.setProperty('--paper', t.paper);
-    document.documentElement.style.setProperty('--text', t.text);
-    document.documentElement.style.setProperty('--text-muted', t.textMuted);
-
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.theme === theme);
-    });
-
-    const overlay = document.getElementById('ambientOverlay');
-    overlay.classList.toggle('active', theme === 'night' || theme === 'dark');
+    if (typeof applyReaderTheme === 'function') {
+        applyReaderTheme(theme);
+    } else {
+        // Fallback for old code
+        currentTheme = theme;
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.theme === theme);
+        });
+    }
 }
 
 // ==========================================
 // FONT SETTINGS
 // ==========================================
 function applyFontSettings() {
-    document.querySelectorAll('.page-text').forEach(el => {
-        el.style.fontFamily = currentFont;
-        el.style.fontSize = fontSize + 'px';
-        el.style.lineHeight = lineHeight;
-    });
+    // Set on #app so theme class specificity doesn't override
+    const app = document.getElementById('app');
+    if (app) {
+        app.style.setProperty('--page-font', currentFont);
+        app.style.setProperty('--font-size', fontSize + 'px');
+        app.style.setProperty('--line-height', lineHeight);
+    }
 }
 
 function setFont(font) {
@@ -303,13 +489,18 @@ function setFont(font) {
 function setFontSize(size) {
     fontSize = Math.max(14, Math.min(28, size));
     document.documentElement.style.setProperty('--font-size', fontSize + 'px');
-    document.getElementById('sizeValue').textContent = fontSize + 'px';
+
+    // Update all size displays
+    const sizeDisplays = document.querySelectorAll('#settingsSizeValue, #sizeValue');
+    sizeDisplays.forEach(el => {
+        if (el) el.textContent = fontSize + 'px';
+    });
+
     applyFontSettings();
 }
 
 function setLineSpacing(spacing) {
     lineHeight = parseFloat(spacing);
-    document.documentElement.style.setProperty('--line-height', lineHeight);
     applyFontSettings();
     document.querySelectorAll('.spacing-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.spacing === spacing);
@@ -327,8 +518,13 @@ function saveLastPosition() {
 function loadLastPosition() {
     try {
         const data = JSON.parse(localStorage.getItem('bookverse_lastPosition'));
-        if (data && data.bookId === currentBook.id) {
-            currentPagePair = data.page || 0;
+        if (data) {
+            // Find the book in library
+            const book = library.find(b => b.id === data.bookId);
+            if (book) {
+                currentBook = book;
+                currentPagePair = data.page || 0;
+            }
         }
     } catch (e) {}
 }
@@ -396,6 +592,8 @@ function updateHighlightCount() {}
 
 function renderNotesList() {
     const body = document.getElementById('notesBody');
+    if (!body) return;
+
     const bookNotes = notes.filter(n => n.bookId === currentBook.id);
 
     if (bookNotes.length === 0) {
@@ -502,7 +700,6 @@ function clearSearch() {
 // ==========================================
 // TEXT-TO-SPEECH
 // ==========================================
-// Get available voices (male/female)
 function getVoices() {
     return speechSynthesis.getVoices().filter(v => v.lang.startsWith('en'));
 }
@@ -513,12 +710,10 @@ function getSelectedVoice() {
     return voices[ttsVoiceIndex % voices.length];
 }
 
-// Auto-select best quality voice
 function autoSelectBestVoice() {
     const voices = getVoices();
     if (voices.length === 0) return;
 
-    // Prefer Google or Microsoft premium voices
     const best = voices.find(v =>
         v.name.includes('Google') && v.name.includes('Natural')
     ) || voices.find(v =>
@@ -539,27 +734,23 @@ function autoSelectBestVoice() {
     }
 }
 
-// Split text into sentences for better TTS quality
 function splitIntoSentences(text) {
-    // Split on sentence endings, keep the punctuation
     const raw = text.match(/[^.!?]+[.!?]+\s*/g) || [text];
     return raw.map(s => s.trim()).filter(s => s.length > 0);
 }
 
-// Clean text for better TTS pronunciation
 function cleanForSpeech(text) {
     return text
-        .replace(/[""]/g, ', ')        // Smart quotes → pause
-        .replace(/['']/g, '')           // Smart apostrophes
-        .replace(/—/g, ', ')            // Em dash → pause
-        .replace(/–/g, ', ')            // En dash → pause
-        .replace(/\.\.\./g, '... ')     // Ellipsis → pause
-        .replace(/\s+/g, ' ')           // Normalize spaces
-        .replace(/\n+/g, ' ')           // Remove newlines
+        .replace(/[""]/g, ', ')
+        .replace(/['']/g, '')
+        .replace(/—/g, ', ')
+        .replace(/–/g, ', ')
+        .replace(/\.\.\./g, '... ')
+        .replace(/\s+/g, ' ')
+        .replace(/\n+/g, ' ')
         .trim();
 }
 
-// Check if voice sounds female
 function isFemaleVoice(voice) {
     if (!voice) return false;
     const name = voice.name.toLowerCase();
@@ -570,16 +761,14 @@ function isFemaleVoice(voice) {
            name.includes('fiona') || name.includes('alice');
 }
 
-// Generation counter — increments every time we restart TTS
-// Old callbacks check this and bail out if stale
 let ttsGeneration = 0;
 
 function speakCurrentPage() {
     speechSynthesis.cancel();
     ttsGeneration++;
-    const myGen = ttsGeneration; // snapshot for this run
+    const myGen = ttsGeneration;
 
-    const text = rightContent.textContent || leftContent.textContent || '';
+    const text = cardBody ? cardBody.textContent : '';
     if (!text.trim()) return;
 
     const cleanText = cleanForSpeech(text);
@@ -587,7 +776,6 @@ function speakCurrentPage() {
     let idx = 0;
 
     function speakNext() {
-        // Bail out if this generation is stale (user changed voice/speed/paused)
         if (myGen !== ttsGeneration) return;
 
         if (idx >= sentences.length || !ttsPlaying) {
@@ -640,7 +828,7 @@ function speakCurrentPage() {
 
 function stopTTS() {
     speechSynthesis.cancel();
-    ttsGeneration++; // kill all old callbacks
+    ttsGeneration++;
     ttsPlaying = false;
     document.getElementById('ttsBar').classList.remove('visible');
     document.getElementById('ttsPlayPause').textContent = '▶';
@@ -656,7 +844,7 @@ let speakNextTimeout = null;
 function toggleFocusMode() {
     document.body.classList.toggle('focus-mode');
     const btn = document.getElementById('focusModeBtn');
-    btn.classList.toggle('active');
+    if (btn) btn.classList.toggle('active');
 }
 
 // ==========================================
@@ -682,20 +870,23 @@ function updateReadingStats() {
     const hours = Math.floor(minutes / 60);
 
     const badge = document.getElementById('timerBadge');
-    if (hours > 0) {
-        badge.textContent = `${hours}h ${minutes % 60}m`;
-    } else {
-        badge.textContent = `${minutes}m`;
+    if (badge) {
+        if (hours > 0) {
+            badge.textContent = `${hours}h ${minutes % 60}m`;
+        } else {
+            badge.textContent = `${minutes}m`;
+        }
     }
 
-    document.getElementById('statPage').textContent = currentPagePair + 1;
-    document.getElementById('statTotal').textContent = totalPagePairs;
-    document.getElementById('statTime').textContent = hours > 0 ? `${hours}h ${minutes % 60}m` : `${minutes}m`;
+    // Update page display
+    if (readerCurrentPage) readerCurrentPage.textContent = currentPagePair + 1;
+    if (readerTotalPages) readerTotalPages.textContent = totalPagePairs;
 }
 
 function setupReadingStats() {
     readingStartTime = Date.now();
     readingTimerInterval = setInterval(updateReadingStats, 5000);
     updateReadingStats();
-    document.getElementById('timerBadge').classList.add('visible');
+    const badge = document.getElementById('timerBadge');
+    if (badge) badge.classList.add('visible');
 }

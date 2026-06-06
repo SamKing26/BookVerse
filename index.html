@@ -6,38 +6,132 @@
     <title>BookVerse — Immersive Reading Experience</title>
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
 
     <!-- CSS Modules -->
     <link rel="stylesheet" href="css/variables.css">
-    <link rel="stylesheet" href="css/preloader.css">
+    <link rel="stylesheet" href="css/hero.css">
+    <link rel="stylesheet" href="css/library.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/book.css">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/features.css">
+    <link rel="stylesheet" href="css/themes.css">
 </head>
 <body>
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="preloader-book">
-            <div class="preloader-pages"></div>
-            <div class="cover">
-                <div class="cover-title">BookVerse</div>
-                <div class="cover-line"></div>
-                <div class="cover-subtitle">Loading...</div>
-            </div>
+    <!-- ========================================
+         HERO PAGE
+         ======================================== -->
+    <div class="hero-page" id="heroPage">
+        <video class="hero-bg-video" autoplay muted loop playsinline preload="auto" poster="assets/hero-bg.jpg">
+            <source src="https://jmncgiimvheclgdcklgu.supabase.co/storage/v1/object/public/King%20TikTok/hero-library.mp4.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-logo">
+            <span class="hero-logo-text">BOOKVERSE</span>
         </div>
-        <p class="preloader-text">Opening your book</p>
+        <div class="hero-center">
+            <p class="hero-title">ENTER VERSE</p>
+            <div class="hero-underline"></div>
+            <p class="hero-enter-hint">Click anywhere or press ENTER to begin</p>
+        </div>
+        <div class="hero-click-area" id="heroClickArea"></div>
     </div>
 
-    <!-- Ambient Overlay -->
-    <div class="ambient-overlay" id="ambientOverlay"></div>
+    <!-- ========================================
+         LIBRARY / THEME SELECTION PAGE
+         ======================================== -->
+    <div class="library-page" id="libraryPage">
+        <div class="library-bg">
+            <video class="library-bg-video" autoplay muted loop playsinline preload="auto" poster="assets/library-bg.jpg">
+                <source src="https://jmncgiimvheclgdcklgu.supabase.co/storage/v1/object/public/King%20TikTok/Libary-background.mp4.mp4" type="video/mp4">
+            </video>
+            <div class="library-bg-overlay"></div>
+        </div>
 
-    <!-- Tooltip -->
-    <div class="tooltip" id="tooltip"></div>
+        <div class="library-header">
+            <span class="library-brand">BOOKVERSE</span>
+        </div>
 
-    <!-- Main App -->
-    <div id="app">
+        <div class="themes-row">
+            <!-- Midnight Scholar -->
+            <div class="theme-card" data-theme="midnight" id="themeCard-midnight">
+                <img class="theme-card-bg" src="assets/themes/midnight.jpg" alt="">
+                <div class="theme-card-badge">
+                    <img src="assets/check.svg" alt="">
+                </div>
+                <div class="theme-card-accent" style="background: #a8b4cc;"></div>
+                <div class="theme-card-info">
+                    <div class="theme-card-name">Midnight Scholar</div>
+                    <div class="theme-card-subtitle">Dark · Focused</div>
+                </div>
+            </div>
+
+            <!-- Amber Candlelight -->
+            <div class="theme-card active" data-theme="amber" id="themeCard-amber">
+                <img class="theme-card-bg" src="assets/themes/amber.jpg" alt="">
+                <div class="theme-card-badge">
+                    <img src="assets/check.svg" alt="">
+                </div>
+                <div class="theme-card-accent" style="background: #d4a853;"></div>
+                <div class="theme-card-info">
+                    <div class="theme-card-name">Amber Candlelight</div>
+                    <div class="theme-card-subtitle">Warm · Classic</div>
+                </div>
+            </div>
+
+            <!-- Ivory Manuscript -->
+            <div class="theme-card ivory" data-theme="ivory" id="themeCard-ivory">
+                <img class="theme-card-bg" src="assets/themes/ivory.jpg" alt="">
+                <div class="theme-card-badge">
+                    <img src="assets/check.svg" alt="">
+                </div>
+                <div class="theme-card-accent" style="background: #78350f;"></div>
+                <div class="theme-card-info">
+                    <div class="theme-card-name">Ivory Manuscript</div>
+                    <div class="theme-card-subtitle">Light · Minimal</div>
+                </div>
+            </div>
+
+            <!-- Emerald Archives -->
+            <div class="theme-card" data-theme="emerald" id="themeCard-emerald">
+                <img class="theme-card-bg" src="assets/themes/emerald.jpg" alt="">
+                <div class="theme-card-badge">
+                    <img src="assets/check.svg" alt="">
+                </div>
+                <div class="theme-card-accent" style="background: #10b981;"></div>
+                <div class="theme-card-info">
+                    <div class="theme-card-name">Emerald Archives</div>
+                    <div class="theme-card-subtitle">Rich · Natural</div>
+                </div>
+            </div>
+
+            <!-- Crimson Codex -->
+            <div class="theme-card" data-theme="crimson" id="themeCard-crimson">
+                <img class="theme-card-bg" src="assets/themes/crimson.jpg" alt="">
+                <div class="theme-card-badge">
+                    <img src="assets/check.svg" alt="">
+                </div>
+                <div class="theme-card-accent" style="background: #fb7185;"></div>
+                <div class="theme-card-info">
+                    <div class="theme-card-name">Crimson Codex</div>
+                    <div class="theme-card-subtitle">Bold · Dramatic</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="library-footer">
+            <button class="library-enter-btn" id="libraryEnterBtn">Enter The Library</button>
+            <p class="library-enter-hint">Press ENTER to confirm selection</p>
+        </div>
+
+        <div class="library-bottom-gradient"></div>
+    </div>
+
+    <!-- ========================================
+         READER APP
+         ======================================== -->
+    <div id="app" class="theme-amber">
         <!-- Dictionary Popup -->
         <div class="dict-popup" id="dictPopup">
             <div class="dict-header">
@@ -95,148 +189,136 @@
         <!-- Reading Timer Badge -->
         <div class="timer-badge" id="timerBadge">00:00</div>
 
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">BOOK<span>VERSE</span></div>
-                <div class="sidebar-subtitle">Your Library</div>
+        <!-- Reader Sidebar -->
+        <div class="reader-sidebar" id="readerSidebar">
+            <div class="reader-sidebar-header">
+                <span class="reader-sidebar-logo">BOOKVERSE</span>
+                <button class="reader-sidebar-close" id="closeSidebar" title="Hide sidebar">✕</button>
             </div>
 
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" placeholder="Search books..." id="searchInput">
+            <div class="reader-search-box">
+                <img src="assets/icons/search.svg" alt="">
+                <input type="text" placeholder="Search books..." id="readerSearchInput">
             </div>
 
-            <div class="book-list" id="bookList">
-                <div style="margin-bottom: 16px;">
-                    <button class="btn-import-pdf" id="sidebarImportBtn" style="
-                        width: 100%;
-                        padding: 14px;
-                        background: rgba(212, 165, 116, 0.1);
-                        border: 1px dashed rgba(212, 165, 116, 0.3);
-                        border-radius: 10px;
-                        color: var(--accent-light);
-                        font-family: var(--font-ui);
-                        font-size: 13px;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        gap: 8px;
-                    ">
-                        📥 Import PDF / eBook
+            <button class="reader-import-btn" id="readerImportBtn">＋  Import PDF / EPUB</button>
+
+            <div class="reader-book-list" id="readerBookList">
+                <div class="reader-book-list-title">My Library</div>
+            </div>
+
+            <div class="reader-bookmarks-section">
+                <div class="reader-book-list-title">🔖 Bookmarks</div>
+                <div class="bookmarks-list" id="bookmarksList">
+                    <div class="bookmarks-empty">No bookmarks yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading Pane -->
+        <div class="reader-pane" id="readerPane">
+            <!-- Toolbar -->
+            <div class="reader-toolbar">
+                <div class="reader-toolbar-left">
+                    <button class="reader-toolbar-btn" id="toggleSidebarBtn" title="Toggle Library">
+                        <span class="hamburger-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
+                    <div class="reader-toolbar-home" id="goHome" title="Back to Library">
+                        <span>🏠</span>
+                        <span>Home</span>
+                    </div>
+                </div>
+                <span class="reader-toolbar-title" id="readerTitle">The Great Gatsby</span>
+                <div class="reader-toolbar-right">
+                    <div class="reader-font-controls">
+                        <div class="reader-font-btn" id="sizeDown" title="Decrease font size">
+                            <span>A-</span>
+                        </div>
+                        <div class="reader-font-btn" id="sizeUp" title="Increase font size">
+                            <span>A+</span>
+                        </div>
+                    </div>
+                    <button class="reader-settings-btn" id="ttsBtn" title="Text to Speech">
+                        <span>🔊</span>
+                        <span>TTS</span>
+                    </button>
+                    <button class="reader-toolbar-btn" id="addBookmark" title="Bookmark this page">
+                        <span>🔖</span>
+                    </button>
+                    <button class="reader-settings-btn" id="fullscreenBtn" title="Fullscreen">
+                        <span>🖥️</span>
+                        <span>Full</span>
+                    </button>
+                    <button class="reader-settings-btn" id="readerSettingsBtn" title="Settings">
+                        <img src="assets/icons/settings.svg" alt="">
+                        <span>Settings</span>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Reading Area -->
-        <div class="reading-area" id="readingArea">
-            <!-- Toolbar -->
-            <div class="toolbar">
-                <div class="toolbar-left">
-                    <button class="tool-btn" id="toggleSidebar" title="Library">📚</button>
-                    <button class="tool-btn" id="toggleToc" title="Table of Contents">📑</button>
-                    <span class="toolbar-title" id="toolbarTitle">The Great Gatsby</span>
-                </div>
-                <div class="toolbar-right">
-                    <div class="import-btn-wrapper">
-                        <button class="tool-btn" id="importPdfBtn" title="Import PDF">📥</button>
-                        <input type="file" accept=".pdf" class="import-input" id="importPdfInput">
-                    </div>
-                    <button class="tool-btn" id="searchBookBtn" title="Search in book">🔍</button>
-                    <button class="tool-btn" id="ttsBtn" title="Read aloud">🔊</button>
-                    <button class="tool-btn" id="focusModeBtn" title="Focus mode">🎯</button>
-                    <button class="tool-btn" id="addBookmark" title="Bookmark">🔖</button>
-                    <button class="tool-btn" id="toggleFullscreen" title="Fullscreen">⛶</button>
-                    <button class="tool-btn" id="toggleSettings" title="Settings">⚙</button>
-                </div>
+            <!-- Progress bar -->
+            <div class="reader-progress">
+                <div class="reader-progress-fill" id="readerProgressFill"></div>
             </div>
 
-            <!-- Book -->
-            <div class="book-container" id="bookContainer">
-                <div class="book" id="book">
-                    <div class="page-edge page-edge-left"></div>
-                    <div class="page page-left" id="pageLeft">
-                        <div class="page-content">
-                            <div class="page-header">
-                                <span class="page-chapter" id="leftChapter">Chapter 1</span>
-                                <span class="page-number" id="leftPageNum">4</span>
-                            </div>
-                            <div class="page-text" id="leftContent"></div>
-                            <div class="page-footer">
-                                <div class="page-footer-line"></div>
-                                <span class="page-number" id="leftFooterNum">4</span>
-                                <div class="page-footer-line"></div>
-                            </div>
-                        </div>
+            <!-- Scroll view -->
+            <div class="reader-scroll" id="readerScroll">
+                <div class="reader-card" id="readerCard">
+                    <div class="card-bookmark-indicator" id="cardBookmarkIndicator">🔖</div>
+                    <div class="reader-chapter-divider">
+                        <div class="reader-chapter-line"></div>
+                        <div class="reader-chapter-label" id="cardChapter">Chapter 1</div>
+                        <div class="reader-chapter-line"></div>
                     </div>
-                    <div class="page page-right" id="pageRight">
-                        <div class="page-content">
-                            <div class="page-header">
-                                <span class="page-chapter" id="rightChapter">Chapter 1</span>
-                                <span class="page-number" id="rightPageNum">5</span>
-                            </div>
-                            <div class="page-text" id="rightContent"></div>
-                            <div class="page-footer">
-                                <div class="page-footer-line"></div>
-                                <span class="page-number" id="rightFooterNum">5</span>
-                                <div class="page-footer-line"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="page-edge page-edge-right"></div>
-                    <div class="bookmark-indicator" id="bookmarkIndicator">
-                        <div class="bookmark-flag"></div>
+                    <div class="reader-card-body" id="cardBody">
+                        <!-- Page content loaded here -->
                     </div>
                 </div>
-                <div class="book-shadow"></div>
             </div>
 
-            <!-- Navigation -->
-            <button class="nav-arrow nav-prev" id="prevPage" title="Previous page">‹</button>
-            <button class="nav-arrow nav-next" id="nextPage" title="Next page">›</button>
-
-            <!-- Keyboard Hints -->
-            <div class="keyboard-hints">
-                <div class="key-hint"><span class="key">←</span> Previous</div>
-                <div class="key-hint"><span class="key">→</span> Next</div>
-                <div class="key-hint"><span class="key">F</span> Fullscreen</div>
-                <div class="key-hint"><span class="key">B</span> Bookmark</div>
-                <div class="key-hint"><span class="key">/</span> Search</div>
-                <div class="key-hint"><span class="key">G</span> Go to page</div>
-                <div class="key-hint"><span class="key">Esc</span> Focus mode</div>
+            <!-- Bottom navigation -->
+            <div class="reader-nav-side reader-nav-left" id="navLeft" title="Previous page">
+                <span>‹</span>
             </div>
-
-            <!-- Progress -->
-            <div class="reading-progress">
-                <div class="reading-progress-fill" id="progressFill"></div>
+            <div class="reader-nav-side reader-nav-right" id="navRight" title="Next page">
+                <span>›</span>
             </div>
-
-            <!-- Reading Stats -->
-            <div class="reading-stats">
-                <div class="stat-item">📖 <span class="stat-value" id="statPage">1</span> / <span id="statTotal">100</span></div>
-                <div class="stat-item">⏱ <span class="stat-value" id="statTime">0m</span></div>
+            <div class="reader-bottom-nav">
+                <div class="reader-nav-btn" id="prevPage" title="Previous page">
+                    <img src="assets/icons/arrow-left.svg" alt="">
+                    <span>Previous</span>
+                </div>
+                <div class="reader-nav-info" id="readerNavInfo">
+                    <span id="readerProgressText">0%</span>  ·  Page <strong id="readerCurrentPage">1</strong> of <span id="readerTotalPages">100</span>
+                </div>
+                <div class="reader-nav-btn" id="nextPage" title="Next page">
+                    <span>Next</span>
+                    <img src="assets/icons/arrow-right.svg" alt="">
+                </div>
             </div>
         </div>
 
-        <!-- Settings Panel -->
+        <!-- Settings Panel (legacy sidebar) -->
         <div class="settings-panel collapsed" id="settingsPanel">
             <div class="settings-title">Reading Settings</div>
 
             <div class="setting-group">
                 <div class="setting-label">Paper Theme</div>
                 <div class="theme-options">
-                    <button class="theme-btn day" data-theme="day" title="Day">☀️</button>
-                    <button class="theme-btn sepia active" data-theme="sepia" title="Sepia">📜</button>
-                    <button class="theme-btn night" data-theme="night" title="Night">🌙</button>
-                    <button class="theme-btn dark" data-theme="dark" title="Dark">⬛</button>
+                    <button class="theme-btn ivory" data-theme="ivory" title="Ivory">📜</button>
+                    <button class="theme-btn amber active" data-theme="amber" title="Amber">🕯️</button>
+                    <button class="theme-btn midnight" data-theme="midnight" title="Midnight">🌙</button>
+                    <button class="theme-btn emerald" data-theme="emerald" title="Emerald">🌿</button>
+                    <button class="theme-btn crimson" data-theme="crimson" title="Crimson">🔥</button>
                 </div>
             </div>
 
             <div class="setting-group">
-                <div class="setting-label">Typeface</div>
+                <div class="setting-label">Text Style</div>
                 <div class="font-options">
                     <button class="font-btn active" data-font="'EB Garamond', serif">
                         <span style="font-family: 'EB Garamond', serif; font-size: 16px;">Garamond</span>
@@ -250,8 +332,8 @@
                         <span style="font-family: 'Playfair Display', serif; font-size: 16px;">Playfair</span>
                         <span class="check">✓</span>
                     </button>
-                    <button class="font-btn" data-font="Georgia, serif">
-                        <span style="font-family: Georgia, serif; font-size: 16px;">Georgia</span>
+                    <button class="font-btn" data-font="'Newsreader', serif">
+                        <span style="font-family: 'Newsreader', serif; font-size: 16px;">Newsreader</span>
                         <span class="check">✓</span>
                     </button>
                 </div>
@@ -260,9 +342,9 @@
             <div class="setting-group">
                 <div class="setting-label">Text Size</div>
                 <div class="size-control">
-                    <button class="size-btn" id="sizeDown">A−</button>
-                    <span class="size-value" id="sizeValue">18px</span>
-                    <button class="size-btn" id="sizeUp">A+</button>
+                    <button class="size-btn" id="settingsSizeDown">A−</button>
+                    <span class="size-value" id="settingsSizeValue">18px</span>
+                    <button class="size-btn" id="settingsSizeUp">A+</button>
                 </div>
             </div>
 
@@ -282,11 +364,6 @@
                     <span>📄 Go to Page</span>
                 </button>
             </div>
-
-            <div class="setting-group">
-                <div class="setting-label">Table of Contents</div>
-                <ul class="toc-list" id="tocList"></ul>
-            </div>
         </div>
     </div>
 
@@ -294,16 +371,16 @@
     <div class="pdf-modal-overlay" id="pdfModal">
         <div class="pdf-modal">
             <div class="pdf-modal-header">
-                <h2 class="pdf-modal-title">Import PDF</h2>
+                <h2 class="pdf-modal-title">Import PDF / EPUB</h2>
                 <button class="pdf-modal-close" id="pdfModalClose">✕</button>
             </div>
 
             <div class="pdf-drop-zone" id="pdfDropZone">
-                <input type="file" accept=".pdf" id="pdfFileInput">
+                <input type="file" accept=".pdf,.epub" id="pdfFileInput">
                 <span class="pdf-drop-icon">📄</span>
-                <div class="pdf-drop-text">Drop your PDF here</div>
+                <div class="pdf-drop-text">Drop your PDF or EPUB here</div>
                 <div class="pdf-drop-subtext">or click to browse files</div>
-                <button class="pdf-browse-btn">Choose PDF</button>
+                <button class="pdf-browse-btn">Choose File</button>
             </div>
 
             <div class="pdf-processing" id="pdfProcessing">
@@ -356,5 +433,6 @@
     <script src="js/book-renderer.js"></script>
     <script src="js/pdf-import.js"></script>
     <script src="js/interactions.js"></script>
+    <script src="js/app-router.js"></script>
 </body>
 </html>
