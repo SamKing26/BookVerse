@@ -19,11 +19,19 @@ function setupEventListeners() {
     // Sidebar toggle (close button in sidebar)
     on('closeSidebar', 'click', () => {
         document.getElementById('readerSidebar').classList.add('collapsed');
+        document.getElementById('sidebarBackdrop').classList.remove('visible');
     });
 
     // Sidebar toggle (button in toolbar)
     on('toggleSidebarBtn', 'click', () => {
         document.getElementById('readerSidebar').classList.remove('collapsed');
+        document.getElementById('sidebarBackdrop').classList.add('visible');
+    });
+
+    // Close sidebar when clicking backdrop
+    on('sidebarBackdrop', 'click', () => {
+        document.getElementById('readerSidebar').classList.add('collapsed');
+        document.getElementById('sidebarBackdrop').classList.remove('visible');
     });
 
     // Side navigation arrows

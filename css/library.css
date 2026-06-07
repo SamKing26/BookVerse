@@ -285,42 +285,59 @@
     }
 
     .library-brand {
-        font-size: 24px;
+        font-size: 22px;
     }
 
     .themes-row {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 16px;
-        margin-top: 40px;
-        padding: 0 20px;
+        gap: 12px;
+        margin-top: 30px;
+        padding: 0 16px;
         max-width: 100%;
     }
 
     .theme-card {
-        width: 150px;
-        height: 200px;
-        padding: 14px;
+        width: 140px;
+        height: 190px;
+        padding: 12px;
     }
 
     .theme-card-name {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .theme-card-subtitle {
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .library-footer {
-        bottom: 40px;
+        bottom: 30px;
     }
 
     .library-enter-btn {
-        padding: 14px 36px;
+        padding: 12px 32px;
         font-size: 13px;
     }
 
     .library-enter-hint {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .themes-row {
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .theme-card {
+        width: 120px;
+        height: 170px;
+        padding: 10px;
+    }
+
+    .theme-card-name {
         font-size: 12px;
     }
 }

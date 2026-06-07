@@ -1119,14 +1119,30 @@
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
     }
 
+    /* Sidebar overlay backdrop */
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+    }
+
+    .sidebar-backdrop.visible {
+        display: block;
+    }
+
     /* Toolbar */
     .reader-toolbar {
-        height: 50px;
-        padding: 0 12px;
+        height: 48px;
+        padding: 0 10px;
     }
 
     .reader-toolbar-title {
-        font-size: 14px;
+        font-size: 13px;
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .reader-toolbar-home span:last-child {
@@ -1138,36 +1154,67 @@
     }
 
     .reader-settings-btn {
-        padding: 8px 10px;
+        padding: 6px 8px;
+        gap: 4px;
+    }
+
+    .reader-settings-btn img {
+        width: 14px;
+        height: 14px;
     }
 
     .reader-font-controls {
         display: none;
     }
 
+    .reader-toolbar-right {
+        gap: 4px;
+    }
+
+    .reader-toolbar-left {
+        gap: 6px;
+    }
+
+    .reader-toolbar-btn {
+        width: 32px;
+        height: 32px;
+    }
+
     /* Reading card */
     .reader-card {
         padding: 20px;
-        border-radius: 0;
-    }
-
-    .reader-card-title {
-        font-size: 28px;
-    }
-
-    .reader-card-author {
-        font-size: 16px;
+        border-radius: 4px;
+        gap: 24px;
     }
 
     .reader-card-body p {
         font-size: 16px !important;
+        line-height: 1.7 !important;
     }
+
+    /* Side arrows */
+    .reader-nav-side {
+        width: 36px;
+        height: 36px;
+        opacity: 0.7;
+    }
+
+    .reader-nav-side span {
+        font-size: 20px;
+    }
+
+    .reader-nav-left { left: 6px; }
+    .reader-nav-right { right: 6px; }
 
     /* Bottom nav */
     .reader-bottom-nav {
         bottom: 12px;
-        gap: 16px;
-        padding: 8px 16px;
+        gap: 12px;
+        padding: 8px 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        max-width: calc(100% - 24px);
     }
 
     .reader-nav-btn {
@@ -1184,35 +1231,48 @@
 
     /* TTS bar */
     .tts-bar {
-        top: 60px;
-        right: 10px;
-        left: 10px;
+        top: 56px;
+        right: 8px;
+        left: 8px;
         transform: none;
         flex-wrap: wrap;
         justify-content: center;
+        padding: 8px 12px;
+        gap: 8px;
     }
 
     /* Scroll */
     .reader-scroll {
-        padding: 60px 12px 100px;
+        padding: 56px 8px 80px;
+    }
+
+    /* Progress */
+    .reader-progress-fill {
+        height: 3px;
     }
 }
 
 @media (max-width: 480px) {
     .reader-card {
         padding: 16px;
-    }
-
-    .reader-card-title {
-        font-size: 24px;
+        gap: 20px;
     }
 
     .reader-card-body p {
         font-size: 15px !important;
+        line-height: 1.65 !important;
     }
 
     .reader-chapter-label {
         font-size: 10px;
+    }
+
+    .reader-chapter-divider {
+        gap: 10px;
+    }
+
+    .reader-chapter-line {
+        width: 60px;
     }
 
     .reader-bottom-nav {
@@ -1220,6 +1280,27 @@
         left: 8px;
         right: 8px;
         transform: none;
+        gap: 8px;
+        padding: 6px 12px;
+    }
+
+    .reader-nav-btn span {
+        font-size: 11px;
+    }
+
+    .reader-nav-info {
+        font-size: 10px;
+    }
+
+    .reader-nav-side {
+        width: 32px;
+        height: 32px;
+    }
+
+    .reader-nav-side span {
+        font-size: 18px;
+    }
+}
         gap: 12px;
         padding: 8px 12px;
     }

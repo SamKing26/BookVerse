@@ -150,27 +150,43 @@
 /* Responsive */
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 36px;
+        font-size: 32px;
         letter-spacing: 6px;
     }
 
     .hero-underline {
-        width: 280px;
+        width: 240px;
     }
 
     .hero-logo {
-        left: 24px;
+        left: 20px;
     }
 
     .hero-logo-text {
-        font-size: 20px;
+        font-size: 18px;
     }
 
     .hero-center {
-        margin-top: 200px;
+        margin-top: 180px;
     }
 
     .hero-enter-hint {
         font-size: 12px;
+        letter-spacing: 1px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 24px;
+        letter-spacing: 4px;
+    }
+
+    .hero-underline {
+        width: 180px;
+    }
+
+    .hero-center {
+        margin-top: 140px;
     }
 }
