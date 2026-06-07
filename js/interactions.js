@@ -496,9 +496,26 @@ function setupKeyboard() {
 function init() {
     cacheDOMElements();
     loadBookmarks();
-    loadLastPosition();
     renderBookList();
+
+    // Restore saved book
+    const saved = JSON.parse(localStorage.getItem('bookverse_lastPosition') || '{}');
+    if (saved.bookId) {
+        const book = library.find(b => b.id === saved.bookId);
+        if (book) currentBook = book;
+    }
+
+    // Load book (this sets currentPagePair = 0 internally)
     loadBook(currentBook);
+
+    // Now override the page and re-render
+    if (saved.page !== undefined && saved.bookId === currentBook.id && saved.page > 0) {
+        currentPagePair = saved.page;
+        renderPages();
+        updateProgress();
+        checkBookmark();
+    }
+
     renderBookmarksList();
     setupEventListeners();
     setupKeyboard();

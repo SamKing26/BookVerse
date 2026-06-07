@@ -39,7 +39,6 @@ function loadBook(book) {
     if (cardTitle) cardTitle.textContent = book.title;
     if (cardAuthor) cardAuthor.textContent = 'by ' + book.author;
 
-    loadLastPosition();
     renderTOC();
     renderPages();
     updateProgress();
@@ -519,7 +518,7 @@ function loadLastPosition() {
     try {
         const data = JSON.parse(localStorage.getItem('bookverse_lastPosition'));
         if (data) {
-            // Find the book in library
+            // Find the saved book in library
             const book = library.find(b => b.id === data.bookId);
             if (book) {
                 currentBook = book;
